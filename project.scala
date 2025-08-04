@@ -1,6 +1,9 @@
 //> using scala 3.7.2
 //> using jvm temurin:8
 
+//> using publish.organization dev.a4i.bsc
+//> using publish.name polygon-overlay-hadoop-mapreduce-naive
+
 //> using options -language:strictEquality
 //> using options -indent -new-syntax -Xkind-projector:underscores
 //> using options -deprecation -feature

@@ -57,7 +57,7 @@ compile:
 test:
 
 
-package:
+assemble:
   mkdir --parents dist
 
   scala --power \
@@ -68,3 +68,8 @@ package:
       .
 
   mv polygon-overlay-naive.jar dist
+
+publish-local:
+  scala --power \
+    publish local --suppress-outdated-dependency-warning \
+      .
