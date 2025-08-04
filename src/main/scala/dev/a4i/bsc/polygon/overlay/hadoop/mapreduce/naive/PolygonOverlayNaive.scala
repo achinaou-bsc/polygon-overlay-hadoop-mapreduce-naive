@@ -1,46 +1,47 @@
 package dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive
 
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.Options
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.conf.Configured
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
+import org.apache.hadoop.util.Tool
+import org.apache.hadoop.util.ToolRunner
 
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveMapperLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveReducerLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWritable
 
-class PolygonOverlayNaive
+class PolygonOverlayNaive extends Configured, Tool:
 
-object PolygonOverlayNaive:
+  private val jobType: String          = "polygon-overlay"
+  private val jobTypeQualifier: String = "mapreduce-naive"
 
-  private val jobType: String                      = "polygon-overlay"
-  private val jobTypeQualifier: String             = "mapreduce-naive"
-  private def jobName(referenceId: String): String = Array(jobType, jobTypeQualifier, referenceId).mkString("_")
+  override def run(args: Array[String]): Int =
+    val options: Options = Options()
+      .addRequiredOption(/* opt */ null, "base", /* hasArg */ true, "Base layer GeoJSON")
+      .addRequiredOption(/* opt */ null, "overlay", /* hasArg */ true, "Overlay layer GeoJSON")
+      .addRequiredOption(/* opt */ null, "output", /* hasArg */ true, "Output directory")
+      .addRequiredOption(/* opt */ null, "reference-id", /* hasArg */ true, "Run identifier")
 
-  def main(args: Array[String]): Unit =
-    val Array(referenceId) = args
+    val commandLine: CommandLine = DefaultParser().parse(options, args, /* stopAtNonOption = */ false)
 
-    sys.exit:
-      if job(referenceId).waitForCompletion(true)
-      then 0
-      else 1
+    val base: Path          = Path(commandLine.getOptionValue("base"))
+    val overlay: Path       = Path(commandLine.getOptionValue("overlay"))
+    val output: Path        = Path(commandLine.getOptionValue("output"))
+    val referenceId: String = commandLine.getOptionValue("referenceId")
 
-  private def job(referenceId: String) =
-    val workingDirectory: Path = Path(s"/jobs/$jobType", referenceId)
-    val inputDirectory: Path   = Path(workingDirectory, "input")
+    val configuration: Configuration = getConf
+    configuration.set("baseLayer.path", base.toString)
 
-    val baseLayer: Path    = Path(inputDirectory, "a.geojson")
-    val overlayLayer: Path = Path(inputDirectory, "b.geojson")
+    val jobName: String = s"${jobType}_${jobTypeQualifier}_${referenceId}"
 
-    val output: Path = Path(workingDirectory, "output")
-
-    val job: Job = Job.getInstance(configuration(baseLayer), jobName(referenceId))
-
-    FileInputFormat.addInputPath(job, baseLayer)
-    FileInputFormat.addInputPath(job, overlayLayer)
-    FileOutputFormat.setOutputPath(job, output)
+    val job: Job = Job.getInstance(configuration, jobName)
 
     job.setJarByClass(classOf[PolygonOverlayNaive])
 
@@ -52,11 +53,15 @@ object PolygonOverlayNaive:
     job.setOutputKeyClass(classOf[Text])
     job.setOutputValueClass(classOf[Text])
 
-    job
+    FileInputFormat.addInputPath(job, base)
+    FileInputFormat.addInputPath(job, overlay)
+    FileOutputFormat.setOutputPath(job, output)
 
-  private def configuration(baseLayer: Path): Configuration =
-    val configuration: Configuration = Configuration()
+    if job.waitForCompletion(true)
+    then 0
+    else 1
 
-    configuration.set("baseLayer.path", baseLayer.toString)
+object PolygonOverlayNaive:
 
-    configuration
+  def main(args: Array[String]): Unit =
+    sys.exit(ToolRunner.run(PolygonOverlayNaive(), args))
