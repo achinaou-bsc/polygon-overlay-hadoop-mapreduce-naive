@@ -52,7 +52,9 @@ clean:
   scala clean .
 
 compile:
-  scala compile .
+  scala --power \
+    compile --suppress-experimental-feature-warning --suppress-outdated-dependency-warning \
+    .
 
 test:
 
