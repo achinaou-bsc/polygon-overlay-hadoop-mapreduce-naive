@@ -61,7 +61,7 @@ jobs:
 
   upload-release-assets:
     name: Upload Release Assets
-    needs: package-application
+    needs: package
     runs-on: ubuntu-latest
     permissions:
       contents: write
