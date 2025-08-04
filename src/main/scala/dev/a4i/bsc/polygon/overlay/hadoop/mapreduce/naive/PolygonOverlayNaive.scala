@@ -34,10 +34,11 @@ class PolygonOverlayNaive extends Configured, Tool:
     val base: Path          = Path(commandLine.getOptionValue("base"))
     val overlay: Path       = Path(commandLine.getOptionValue("overlay"))
     val output: Path        = Path(commandLine.getOptionValue("output"))
-    val referenceId: String = commandLine.getOptionValue("referenceId")
+    val referenceId: String = commandLine.getOptionValue("reference-id")
 
     val configuration: Configuration = getConf
     configuration.set("baseLayer.path", base.toString)
+    configuration.set("overlayLayer.path", overlay.toString)
 
     val jobName: String = s"${jobType}_${jobTypeQualifier}_${referenceId}"
 
