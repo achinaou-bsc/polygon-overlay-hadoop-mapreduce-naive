@@ -17,7 +17,7 @@ import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNai
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveReducerLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWritable
 
-class PolygonOverlayNaive extends Configured, Tool:
+class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
 
   private val jobType: String          = "polygon-overlay"
   private val jobTypeQualifier: String = "mapreduce-naive"
@@ -44,7 +44,7 @@ class PolygonOverlayNaive extends Configured, Tool:
 
     val job: Job = Job.getInstance(configuration, jobName)
 
-    job.setJarByClass(classOf[PolygonOverlayNaive])
+    job.setJarByClass(classOf[PolygonOverlayHadoopMapReduceNaive])
 
     job.setMapperClass(classOf[PolygonOverlayNaiveMapperLive])
     job.setMapOutputKeyClass(classOf[Text])
@@ -62,7 +62,7 @@ class PolygonOverlayNaive extends Configured, Tool:
     then 0
     else 1
 
-object PolygonOverlayNaive:
+object PolygonOverlayHadoopMapReduceNaive:
 
   def main(args: Array[String]): Unit =
-    sys.exit(ToolRunner.run(PolygonOverlayNaive(), args))
+    sys.exit(ToolRunner.run(PolygonOverlayHadoopMapReduceNaive(), args))

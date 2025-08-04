@@ -58,20 +58,24 @@ compile:
 
 test:
 
-
-assemble:
+package:
   mkdir --parents dist
 
   scala --power \
-    package --suppress-outdated-dependency-warning --assembly \
+    package --suppress-experimental-feature-warning --suppress-outdated-dependency-warning \
+      --output polygon-overlay-hadoop-mapreduce-naive.jar \
+      .
+
+  mv polygon-overlay-hadoop-mapreduce-naive.jar dist
+
+package-assembly:
+  mkdir --parents dist
+
+  scala --power \
+    package --suppress-experimental-feature-warning --suppress-outdated-dependency-warning --assembly \
       --provided org.apache.hadoop:hadoop-client-api \
       --preamble=false \
-      --output polygon-overlay-naive.jar \
+      --output polygon-overlay-hadoop-mapreduce-naive-all.jar \
       .
 
-  mv polygon-overlay-naive.jar dist
-
-publish-local:
-  scala --power \
-    publish local --suppress-outdated-dependency-warning \
-      .
+  mv polygon-overlay-hadoop-mapreduce-naive-all.jar dist
