@@ -62,20 +62,10 @@ package:
   mkdir --parents dist
 
   scala --power \
-    package --suppress-experimental-feature-warning --suppress-outdated-dependency-warning \
+    package --suppress-experimental-feature-warning --suppress-outdated-dependency-warning --assembly \
+      --provided org.apache.hadoop:hadoop-client-api \
+      --preamble=false \
       --output polygon-overlay-hadoop-mapreduce-naive.jar \
       .
 
   mv polygon-overlay-hadoop-mapreduce-naive.jar dist
-
-package-assembly:
-  mkdir --parents dist
-
-  scala --power \
-    package --suppress-experimental-feature-warning --suppress-outdated-dependency-warning --assembly \
-      --provided org.apache.hadoop:hadoop-client-api \
-      --preamble=false \
-      --output polygon-overlay-hadoop-mapreduce-naive-all.jar \
-      .
-
-  mv polygon-overlay-hadoop-mapreduce-naive-all.jar dist

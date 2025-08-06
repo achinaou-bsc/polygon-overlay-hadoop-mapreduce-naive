@@ -39,24 +39,14 @@ jobs:
       - name: Test
         run: just test
 
-      - name: Package Library
+      - name: Package
         run: just package
-      
-      - name: Package Assembly
-        run: just package-assembly
 
-      - name: Upload Library Package
+      - name: Upload Package
         uses: actions/upload-artifact@v4
         with:
-          name: Library Package
+          name: Package
           path: ./dist/polygon-overlay-hadoop-mapreduce-naive.jar
-          retention-days: 7
-
-      - name: Upload Assembly Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: Assembly Package
-          path: ./dist/polygon-overlay-hadoop-mapreduce-naive-all.jar
           retention-days: 7
 
   upload-release-assets:
@@ -66,17 +56,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download Library Package
+      - name: Download Package
         uses: actions/download-artifact@v4
         with:
-          name: Library Package
+          name: Package
 
-      - name: Download Assembly Package
-        uses: actions/download-artifact@v4
-        with:
-          name: Assembly Package
-
-      - name: Upload Library Release Asset
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,14 +69,4 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: polygon-overlay-hadoop-mapreduce-naive.jar
           asset_name: polygon-overlay-hadoop-mapreduce-naive.jar
-          asset_content_type: application/java-archive
-
-      - name: Upload Assembly Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: polygon-overlay-hadoop-mapreduce-naive-all.jar
-          asset_name: polygon-overlay-hadoop-mapreduce-naive-all.jar
           asset_content_type: application/java-archive

@@ -20,6 +20,7 @@ services:
     hostname: resourcemanager
     command: [yarn, resourcemanager]
     ports:
+      - 8032:8032
       - 8088:8088
     env_file:
       - ./hadoop/config
