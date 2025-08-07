@@ -21,7 +21,8 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
 
   private val jobType: String          = "polygon-overlay"
   private val jobTypeQualifier: String = "mapreduce-naive"
-  private var jobId: Option[String]    = None
+
+  var jobId: Option[String] = None
 
   override def run(args: Array[String]): Int =
     val options: Options = Options()
