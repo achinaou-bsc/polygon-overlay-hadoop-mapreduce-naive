@@ -21,6 +21,7 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
 
   private val jobType: String          = "polygon-overlay"
   private val jobTypeQualifier: String = "mapreduce-naive"
+  private var jobId: Option[String]    = None
 
   override def run(args: Array[String]): Int =
     val options: Options = Options()
@@ -64,6 +65,7 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
     then if job.waitForCompletion(true) then 0 else 1
     else
       job.submit
+      jobId = Some(job.getJobID.getJtIdentifier)
       0
 
 object PolygonOverlayHadoopMapReduceNaive:
