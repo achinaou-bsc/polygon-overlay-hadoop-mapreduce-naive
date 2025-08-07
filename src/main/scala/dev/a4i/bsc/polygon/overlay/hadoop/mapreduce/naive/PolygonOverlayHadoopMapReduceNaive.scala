@@ -28,13 +28,15 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
       .addRequiredOption(/* opt */ null, "overlay", /* hasArg */ true, "Overlay layer GeoJSON")
       .addRequiredOption(/* opt */ null, "output", /* hasArg */ true, "Output directory")
       .addRequiredOption(/* opt */ null, "reference-id", /* hasArg */ true, "Run identifier")
+      .addOption(/* opt */ null, "wait-for-completion", /* hasArg */ true, "Wait for the completion of the job")
 
     val commandLine: CommandLine = DefaultParser().parse(options, args, /* stopAtNonOption = */ false)
 
-    val base: Path          = Path(commandLine.getOptionValue("base"))
-    val overlay: Path       = Path(commandLine.getOptionValue("overlay"))
-    val output: Path        = Path(commandLine.getOptionValue("output"))
-    val referenceId: String = commandLine.getOptionValue("reference-id")
+    val base: Path                 = Path(commandLine.getOptionValue("base"))
+    val overlay: Path              = Path(commandLine.getOptionValue("overlay"))
+    val output: Path               = Path(commandLine.getOptionValue("output"))
+    val referenceId: String        = commandLine.getOptionValue("reference-id")
+    val waitForCompletion: Boolean = commandLine.getOptionValue("wait-for-completion", "true").toBoolean
 
     val configuration: Configuration = getConf
     configuration.set("baseLayer.path", base.toString)
@@ -58,9 +60,11 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
     FileInputFormat.addInputPath(job, overlay)
     FileOutputFormat.setOutputPath(job, output)
 
-    if job.waitForCompletion(true)
-    then 0
-    else 1
+    if waitForCompletion
+    then if job.waitForCompletion(true) then 0 else 1
+    else
+      job.submit
+      0
 
 object PolygonOverlayHadoopMapReduceNaive:
 
