@@ -20,7 +20,7 @@ import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWr
 class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
 
   private val jobType: String          = "polygon-overlay"
-  private val jobTypeQualifier: String = "mapreduce-naive"
+  private val jobTypeQualifier: String = "hadoop-mapreduce-naive"
 
   var jobId: Option[String] = None
 
