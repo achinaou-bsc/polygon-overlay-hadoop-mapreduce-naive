@@ -16,13 +16,14 @@ import org.apache.hadoop.util.ToolRunner
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveMapperLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveReducerLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWritable
+import org.apache.hadoop.mapreduce.JobID
 
 class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
 
   private val jobType: String          = "polygon-overlay"
   private val jobTypeQualifier: String = "hadoop-mapreduce-naive"
 
-  var jobId: Option[String] = None
+  var jobId: Option[JobID] = None
 
   override def run(args: Array[String]): Int =
     val options: Options = Options()
@@ -66,7 +67,7 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
     then if job.waitForCompletion(true) then 0 else 1
     else
       job.submit
-      jobId = Some(job.getJobID.getJtIdentifier)
+      jobId = Some(job.getJobID)
       0
 
 object PolygonOverlayHadoopMapReduceNaive:
