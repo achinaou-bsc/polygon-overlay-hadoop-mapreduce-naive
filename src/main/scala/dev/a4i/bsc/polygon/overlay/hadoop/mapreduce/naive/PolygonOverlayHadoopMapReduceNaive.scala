@@ -8,6 +8,7 @@ import org.apache.hadoop.conf.Configured
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.mapreduce.Job
+import org.apache.hadoop.mapreduce.JobID
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.util.Tool
@@ -16,7 +17,6 @@ import org.apache.hadoop.util.ToolRunner
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveMapperLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live.PolygonOverlayNaiveReducerLive
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWritable
-import org.apache.hadoop.mapreduce.JobID
 
 class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
 
