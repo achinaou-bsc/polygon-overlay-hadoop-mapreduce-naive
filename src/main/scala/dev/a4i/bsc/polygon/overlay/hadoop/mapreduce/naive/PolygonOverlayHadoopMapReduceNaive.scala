@@ -41,11 +41,18 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
     val referenceId: String        = commandLine.getOptionValue("reference-id")
     val waitForCompletion: Boolean = commandLine.getOptionValue("wait-for-completion", "true").toBoolean
 
-    val configuration: Configuration = getConf
-    configuration.set("baseLayer.path", base.toString)
-    configuration.set("overlayLayer.path", overlay.toString)
+    val job: Job = getJob(base, overlay, output, referenceId)
 
-    val jobName: String = s"${jobType}_${jobTypeQualifier}_${referenceId}"
+    if waitForCompletion
+    then if job.waitForCompletion(true) then 0 else 1
+    else
+      job.submit
+      jobId = Some(job.getJobID)
+      0
+
+  private def getJob(base: Path, overlay: Path, output: Path, referenceId: String): Job =
+    val configuration: Configuration = getConfiguration(base, overlay)
+    val jobName: String              = s"${jobType}_${jobTypeQualifier}_${referenceId}"
 
     val job: Job = Job.getInstance(configuration, jobName)
 
@@ -63,12 +70,15 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
     FileInputFormat.addInputPath(job, overlay)
     FileOutputFormat.setOutputPath(job, output)
 
-    if waitForCompletion
-    then if job.waitForCompletion(true) then 0 else 1
-    else
-      job.submit
-      jobId = Some(job.getJobID)
-      0
+    job
+
+  private def getConfiguration(base: Path, overlay: Path): Configuration =
+    val configuration: Configuration = getConf
+
+    configuration.set("baseLayer.path", base.toString)
+    configuration.set("overlayLayer.path", overlay.toString)
+
+    configuration
 
 object PolygonOverlayHadoopMapReduceNaive:
 
