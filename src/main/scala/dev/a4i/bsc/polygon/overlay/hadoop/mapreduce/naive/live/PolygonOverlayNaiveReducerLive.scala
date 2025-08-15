@@ -32,7 +32,7 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
     overlayLayerGeometries
       .filter(overlaps(baseLayerGeometry))
       .map(overlay(baseLayerGeometry))
-      .foreach(overlayGeometry => context.write(NullWritable.get(), Text(GeoJSON.serialize(overlayGeometry))))
+      .foreach(overlayGeometry => context.write(NullWritable.get, Text(GeoJSON.serialize(overlayGeometry))))
 
   private def overlaps(a: Geometry)(b: Geometry): Boolean =
     a.intersects(b)
