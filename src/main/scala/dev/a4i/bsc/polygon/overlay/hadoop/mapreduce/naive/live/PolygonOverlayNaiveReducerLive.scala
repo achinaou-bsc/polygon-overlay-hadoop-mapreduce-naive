@@ -3,6 +3,7 @@ package dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.live
 import java.lang.Iterable as JavaIterable
 import scala.jdk.CollectionConverters.given
 
+import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.io.Text
 import org.locationtech.jts.geom.Geometry
 
@@ -31,7 +32,7 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
     overlayLayerGeometries
       .filter(overlaps(baseLayerGeometry))
       .map(overlay(baseLayerGeometry))
-      .foreach(overlayGeometry => context.write(key, Text(GeoJSON.serialize(overlayGeometry))))
+      .foreach(overlayGeometry => context.write(NullWritable.get(), Text(GeoJSON.serialize(overlayGeometry))))
 
   private def overlaps(a: Geometry)(b: Geometry): Boolean =
     a.intersects(b)
