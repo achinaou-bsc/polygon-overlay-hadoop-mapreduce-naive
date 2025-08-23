@@ -67,8 +67,6 @@ class PolygonOverlayHadoopMapReduceNaive extends Configured, Tool:
     job.setOutputKeyClass(classOf[NullWritable])
     job.setOutputValueClass(classOf[Text])
 
-    job.setNumReduceTasks(1)
-
     FileInputFormat.addInputPath(job, base)
     FileInputFormat.addInputPath(job, overlay)
     FileOutputFormat.setOutputPath(job, output)
