@@ -36,7 +36,7 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
       .map(overlay(baseLayerGeometry))
       .foreach: overlayGeometry =>
         context.write(NullWritable.get, Text(GeoJSON.serialize(overlayGeometry)))
-        context.getCounter(PolygonOverlayNaiveReducerLive.Counter.REUCE_OUTPUT_POLYGONS).increment(1)
+        context.getCounter(PolygonOverlayNaiveReducerLive.Counter.REDUCE_OUTPUT_POLYGONS).increment(1)
 
   private def overlaps(a: Geometry)(b: Geometry)(using context: PolygonOverlayNaiveReducer#Context): Boolean =
     val result: Boolean = a.intersects(b)
@@ -53,4 +53,4 @@ object PolygonOverlayNaiveReducerLive:
   enum Counter extends Enum[Counter]:
     case INTERSECTION_CHECKS
     case INTERSECTION_CALCULATIONS
-    case REUCE_OUTPUT_POLYGONS
+    case REDUCE_OUTPUT_POLYGONS
