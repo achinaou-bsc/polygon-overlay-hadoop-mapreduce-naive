@@ -29,7 +29,7 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
 
     val baseLayerGeometry: Geometry = baseLayerGeometries.head
 
-    overlayLayerGeometries
+    overlayLayerGeometries.iterator
       .filter(overlaps(baseLayerGeometry))
       .map(overlay(baseLayerGeometry))
       .foreach(overlayGeometry => context.write(NullWritable.get, Text(GeoJSON.serialize(overlayGeometry))))
