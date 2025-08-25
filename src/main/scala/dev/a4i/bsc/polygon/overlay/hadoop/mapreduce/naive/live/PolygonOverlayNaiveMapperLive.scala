@@ -43,11 +43,11 @@ class PolygonOverlayNaiveMapperLive extends PolygonOverlayNaiveMapper:
 
     currentLayerType match
       case LayerType.Base    =>
-        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.BASE_POLYGONS_READS).increment(1)
+        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.BASE_POLYGON_READS).increment(1)
         context.write(Text(id), TaggedGeometryWritable(TaggedGeometry(currentLayerType, geometry)))
         context.getCounter(PolygonOverlayNaiveMapperLive.Counter.MAP_OUTPUT_RECORDS).increment(1)
       case LayerType.Overlay =>
-        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.OVERLAY_POLYGONS_READS).increment(1)
+        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.OVERLAY_POLYGON_READS).increment(1)
 
         baseLayerFeatureIds.foreach: baseLayerFeatureId =>
           context.write(Text(baseLayerFeatureId), TaggedGeometryWritable(TaggedGeometry(currentLayerType, geometry)))
@@ -56,6 +56,6 @@ class PolygonOverlayNaiveMapperLive extends PolygonOverlayNaiveMapper:
 object PolygonOverlayNaiveMapperLive:
 
   enum Counter extends Enum[Counter]:
-    case BASE_POLYGONS_READS
-    case OVERLAY_POLYGONS_READS
+    case BASE_POLYGON_READS
+    case OVERLAY_POLYGON_READS
     case MAP_OUTPUT_RECORDS
