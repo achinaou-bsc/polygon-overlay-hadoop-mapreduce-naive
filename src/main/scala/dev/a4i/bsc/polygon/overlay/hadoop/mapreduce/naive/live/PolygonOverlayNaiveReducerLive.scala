@@ -19,6 +19,8 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
       values: JavaIterable[TaggedGeometryWritable],
       context: PolygonOverlayNaiveReducer#Context
   ): Unit =
+    given PolygonOverlayNaiveReducer#Context = context
+
     val taggedGeometries: Array[TaggedGeometry] = values.asScala
       .map(_.taggedGeometry)
       .toArray
@@ -32,10 +34,23 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
     overlayLayerGeometries.iterator
       .filter(overlaps(baseLayerGeometry))
       .map(overlay(baseLayerGeometry))
-      .foreach(overlayGeometry => context.write(NullWritable.get, Text(GeoJSON.serialize(overlayGeometry))))
+      .foreach: overlayGeometry =>
+        context.write(NullWritable.get, Text(GeoJSON.serialize(overlayGeometry)))
+        context.getCounter(PolygonOverlayNaiveReducerLive.Counter.REUCE_OUTPUT_POLYGONS).increment(1)
 
-  private def overlaps(a: Geometry)(b: Geometry): Boolean =
-    a.intersects(b)
+  private def overlaps(a: Geometry)(b: Geometry)(using context: PolygonOverlayNaiveReducer#Context): Boolean =
+    val result: Boolean = a.intersects(b)
+    context.getCounter(PolygonOverlayNaiveReducerLive.Counter.INTERSECTION_CHECKS).increment(1)
+    result
 
-  private def overlay(a: Geometry)(b: Geometry): Geometry =
-    a.intersection(b)
+  private def overlay(a: Geometry)(b: Geometry)(using context: PolygonOverlayNaiveReducer#Context): Geometry =
+    val result: Geometry = a.intersection(b)
+    context.getCounter(PolygonOverlayNaiveReducerLive.Counter.INTERSECTION_CALCULATIONS).increment(1)
+    result
+
+object PolygonOverlayNaiveReducerLive:
+
+  enum Counter extends Enum[Counter]:
+    case INTERSECTION_CHECKS
+    case INTERSECTION_CALCULATIONS
+    case REUCE_OUTPUT_POLYGONS
