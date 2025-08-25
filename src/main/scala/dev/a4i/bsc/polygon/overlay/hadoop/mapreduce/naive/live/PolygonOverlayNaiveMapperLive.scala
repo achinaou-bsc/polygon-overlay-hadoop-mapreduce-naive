@@ -11,6 +11,7 @@ import org.apache.hadoop.io.Text
 import org.apache.hadoop.mapreduce.lib.input.FileSplit
 import org.locationtech.jts.geom.Geometry
 
+import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.Counter
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.LayerType
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometry
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWritable
@@ -43,19 +44,12 @@ class PolygonOverlayNaiveMapperLive extends PolygonOverlayNaiveMapper:
 
     currentLayerType match
       case LayerType.Base    =>
-        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.BASE_POLYGON_READS).increment(1)
+        context.getCounter(Counter.BASE_POLYGON_READS).increment(1)
         context.write(Text(id), TaggedGeometryWritable(TaggedGeometry(currentLayerType, geometry)))
-        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.MAP_OUTPUT_RECORDS).increment(1)
+        context.getCounter(Counter.MAP_OUTPUT_WRITES).increment(1)
       case LayerType.Overlay =>
-        context.getCounter(PolygonOverlayNaiveMapperLive.Counter.OVERLAY_POLYGON_READS).increment(1)
+        context.getCounter(Counter.OVERLAY_POLYGON_READS).increment(1)
 
         baseLayerFeatureIds.foreach: baseLayerFeatureId =>
           context.write(Text(baseLayerFeatureId), TaggedGeometryWritable(TaggedGeometry(currentLayerType, geometry)))
-          context.getCounter(PolygonOverlayNaiveMapperLive.Counter.MAP_OUTPUT_RECORDS).increment(1)
-
-object PolygonOverlayNaiveMapperLive:
-
-  enum Counter extends Enum[Counter]:
-    case BASE_POLYGON_READS
-    case OVERLAY_POLYGON_READS
-    case MAP_OUTPUT_RECORDS
+          context.getCounter(Counter.MAP_OUTPUT_WRITES).increment(1)

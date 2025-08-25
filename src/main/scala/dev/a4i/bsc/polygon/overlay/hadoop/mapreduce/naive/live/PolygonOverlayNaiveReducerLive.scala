@@ -7,6 +7,7 @@ import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.io.Text
 import org.locationtech.jts.geom.Geometry
 
+import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.Counter
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.LayerType
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometry
 import dev.a4i.bsc.polygon.overlay.hadoop.mapreduce.naive.model.TaggedGeometryWritable
@@ -25,9 +26,10 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
       .map(_.taggedGeometry)
       .toArray
 
-    val (baseLayerGeometries: Array[Geometry], overlayLayerGeometries: Array[Geometry]) = taggedGeometries.partitionMap:
-      case TaggedGeometry(LayerType.Base, geometry)    => Left(geometry)
-      case TaggedGeometry(LayerType.Overlay, geometry) => Right(geometry)
+    val (baseLayerGeometries: Array[Geometry], overlayLayerGeometries: Array[Geometry]) =
+      taggedGeometries.partitionMap:
+        case TaggedGeometry(LayerType.Base, geometry)    => Left(geometry)
+        case TaggedGeometry(LayerType.Overlay, geometry) => Right(geometry)
 
     val baseLayerGeometry: Geometry = baseLayerGeometries.head
 
@@ -36,21 +38,14 @@ class PolygonOverlayNaiveReducerLive extends PolygonOverlayNaiveReducer:
       .map(overlay(baseLayerGeometry))
       .foreach: overlayGeometry =>
         context.write(NullWritable.get, Text(GeoJSON.serialize(overlayGeometry)))
-        context.getCounter(PolygonOverlayNaiveReducerLive.Counter.REDUCE_OUTPUT_POLYGONS).increment(1)
+        context.getCounter(Counter.MAP_OUTPUT_WRITES).increment(1)
 
   private def overlaps(a: Geometry)(b: Geometry)(using context: PolygonOverlayNaiveReducer#Context): Boolean =
     val result: Boolean = a.intersects(b)
-    context.getCounter(PolygonOverlayNaiveReducerLive.Counter.INTERSECTION_CHECKS).increment(1)
+    context.getCounter(Counter.INTERSECTION_CHECKS).increment(1)
     result
 
   private def overlay(a: Geometry)(b: Geometry)(using context: PolygonOverlayNaiveReducer#Context): Geometry =
     val result: Geometry = a.intersection(b)
-    context.getCounter(PolygonOverlayNaiveReducerLive.Counter.INTERSECTION_CALCULATIONS).increment(1)
+    context.getCounter(Counter.INTERSECTION_CALCULATIONS).increment(1)
     result
-
-object PolygonOverlayNaiveReducerLive:
-
-  enum Counter extends Enum[Counter]:
-    case INTERSECTION_CHECKS
-    case INTERSECTION_CALCULATIONS
-    case REDUCE_OUTPUT_POLYGONS
