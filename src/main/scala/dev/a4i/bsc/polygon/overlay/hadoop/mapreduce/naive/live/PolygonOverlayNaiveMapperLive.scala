@@ -44,12 +44,12 @@ class PolygonOverlayNaiveMapperLive extends PolygonOverlayNaiveMapper:
 
     currentLayerType match
       case LayerType.Base    =>
-        context.getCounter(Counter.BASE_POLYGON_READS).increment(1)
+        context.getCounter(Counter.BASE_POLYGONS_READ).increment(1)
         context.write(Text(id), TaggedGeometryWritable(TaggedGeometry(currentLayerType, geometry)))
-        context.getCounter(Counter.MAP_OUTPUT_WRITES).increment(1)
+        context.getCounter(Counter.MAP_OUTPUTS_WRITTEN).increment(1)
       case LayerType.Overlay =>
-        context.getCounter(Counter.OVERLAY_POLYGON_READS).increment(1)
+        context.getCounter(Counter.OVERLAY_POLYGONS_READ).increment(1)
 
         baseLayerFeatureIds.foreach: baseLayerFeatureId =>
           context.write(Text(baseLayerFeatureId), TaggedGeometryWritable(TaggedGeometry(currentLayerType, geometry)))
-          context.getCounter(Counter.MAP_OUTPUT_WRITES).increment(1)
+          context.getCounter(Counter.MAP_OUTPUTS_WRITTEN).increment(1)
